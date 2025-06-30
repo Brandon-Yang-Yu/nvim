@@ -22,6 +22,21 @@ require("lazy").setup({
   -- File searching and navigation
   { "junegunn/fzf", build = "./install --all" },
   { "junegunn/fzf.vim" },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    }
+  },
+  
+  -- Status line
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" }
+  },
   
   -- Rust development
   { "rust-lang/rust.vim" },
@@ -85,6 +100,27 @@ vim.opt.regexpengine = 1                    -- Use old regex engine for better p
 -- Theme
 vim.cmd("colorscheme molokai")              -- Set color scheme
 
+-- ==============================================================================
+-- PLUGIN CONFIGURATION
+-- ==============================================================================
+
+-- Lualine configuration
+require('lualine').setup {
+  options = {
+    theme = 'molokai',
+    section_separators = { left = '', right = '' },
+    component_separators = { left = '', right = '' }
+  },
+  sections = {
+    lualine_a = {'mode'},
+    lualine_b = {'branch', 'diff', 'diagnostics'},
+    lualine_c = {'filename'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
+  }
+}
+
 -- Project-specific path
 vim.opt.path:append("/Users/yy/Project/UNP/unpv13e/**")  -- Add UNP project to search path
 
@@ -136,6 +172,9 @@ vim.api.nvim_set_keymap('n', '<leader>d', '"_d', { noremap = true })
 
 -- FZF file finder
 vim.api.nvim_set_keymap('n', '<leader>ff', ':FZF<CR>', { noremap = true })
+
+-- Neo-tree file explorer
+vim.api.nvim_set_keymap('n', '<leader>ee', ':Neotree toggle<CR>', { noremap = true })
 
 -- Git integration
 vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
