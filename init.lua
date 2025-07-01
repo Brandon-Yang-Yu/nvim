@@ -121,6 +121,15 @@ require('lualine').setup {
   }
 }
 
+-- Treesitter configuration
+require('nvim-treesitter.configs').setup{
+  ensure_installed = { 'typescript', 'tsx', 'javascript' },
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+}
+
 -- Project-specific path
 vim.opt.path:append("/Users/yy/Project/UNP/unpv13e/**")  -- Add UNP project to search path
 
