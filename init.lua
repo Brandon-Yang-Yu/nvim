@@ -215,3 +215,9 @@ vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
 
 -- Open terminal
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
+
+-- Window resize functions (accepts count, e.g., 20> to resize horizontally by 20)
+vim.api.nvim_set_keymap('n', '>', ':<C-u>vertical resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<', ':<C-u>vertical resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '+', ':<C-u>resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '-', ':<C-u>resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
