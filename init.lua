@@ -42,14 +42,11 @@ require("lazy").setup({
       require("lspsaga").setup({
         outline = {
           win_position = "right",
-          win_with = "",
           win_width = 30,
-          preview_width = 0.4,
           show_detail = true,
-          auto_preview = true,
+          auto_preview = false,
           auto_refresh = true,
           auto_close = true,
-          custom_sort = nil,
           keys = {
             expand_or_jump = 'o',
             quit = "q",
