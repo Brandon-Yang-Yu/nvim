@@ -18,7 +18,64 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   -- Syntax highlighting and language support
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
-  
+
+  -- LSP configuration
+  { "neovim/nvim-lspconfig" },
+  {
+    "williamboman/mason.nvim",
+    config = function()
+      require("mason").setup()
+    end
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "mason.nvim", "nvim-lspconfig" },
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = { "lua_ls", "pyright", "ts_ls", "rust_analyzer", "clangd" }
+      })
+    end
+  },
+  {
+    "nvimdev/lspsaga.nvim",
+    config = function()
+      require("lspsaga").setup({
+        outline = {
+          win_position = "right",
+          win_with = "",
+          win_width = 30,
+          preview_width = 0.4,
+          show_detail = true,
+          auto_preview = true,
+          auto_refresh = true,
+          auto_close = true,
+          custom_sort = nil,
+          keys = {
+            expand_or_jump = 'o',
+            quit = "q",
+          },
+        },
+      })
+    end,
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons"
+    }
+  },
+
+  -- Completion
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip"
+    }
+  },
+
   -- File searching and navigation
   { "junegunn/fzf", build = "./install --all" },
   { "junegunn/fzf.vim" },
@@ -31,22 +88,22 @@ require("lazy").setup({
       "MunifTanjim/nui.nvim",
     }
   },
-  
+
   -- Status line
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" }
   },
-  
+
   -- Rust development
   { "rust-lang/rust.vim" },
-  
+
   -- Git integration
   { "tpope/vim-fugitive" },
-  
+
   -- Theme
   { "tomasr/molokai" },
-  
+
   -- Claude Code integration
   {
     "coder/claudecode.nvim",
@@ -155,6 +212,96 @@ require('nvim-treesitter.configs').setup{
   },
 }
 
+-- LSP configuration
+local lspconfig = require('lspconfig')
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- Setup language servers
+local servers = { 'lua_ls', 'pyright', 'ts_ls', 'rust_analyzer', 'clangd' }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup {
+    capabilities = capabilities,
+    on_attach = function(client, bufnr)
+      local bufopts = { noremap=true, silent=true, buffer=bufnr }
+      vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+      vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+      vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+      vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+      vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+      vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+      vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, bufopts)
+    end,
+  }
+end
+
+-- Setup nvim-cmp
+local cmp = require'cmp'
+local luasnip = require'luasnip'
+
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  }, {
+    { name = 'buffer' },
+    { name = 'path' },
+  })
+})
+
+-- Use buffer source for `/` and `?`
+cmp.setup.cmdline({ '/', '?' }, {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = 'buffer' }
+  }
+})
+
+-- Use cmdline & path source for ':'
+cmp.setup.cmdline(':', {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
+
 -- Project-specific path
 vim.opt.path:append("/Users/yy/Project/UNP/unpv13e/**")  -- Add UNP project to search path
 
@@ -215,6 +362,14 @@ vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
 
 -- Open terminal
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
+
+-- LSPSaga keymaps
+vim.api.nvim_set_keymap('n', '<leader>o', '<cmd>Lspsaga outline<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>pt', '<cmd>Lspsaga peek_type_definition<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'K', '<cmd>Lspsaga hover_doc<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ci', '<cmd>Lspsaga incoming_calls<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>co', '<cmd>Lspsaga outgoing_calls<CR>', { noremap = true, silent = true })
 
 -- Window resize functions (accepts count, e.g., 20> to resize horizontally by 20)
 vim.api.nvim_set_keymap('n', '>', ':<C-u>vertical resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
