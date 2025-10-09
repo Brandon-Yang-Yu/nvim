@@ -18,6 +18,40 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   -- Syntax highlighting and language support
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  {
+    "andymass/vim-matchup",
+    init = function()
+      vim.g.matchup_matchparen_hi_surround_always = 1
+      vim.g.matchup_matchparen_offscreen = { method = 'status' }
+    end,
+  },
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    config = function()
+      local rainbow_delimiters = require("rainbow-delimiters")
+      vim.g.rainbow_delimiters = {
+        strategy = {
+          [''] = rainbow_delimiters.strategy['global'],
+          vim = rainbow_delimiters.strategy['local'],
+        },
+        query = {
+          [''] = 'rainbow-delimiters',
+          tsx = 'rainbow-parens',
+          javascript = 'rainbow-parens',
+          typescript = 'rainbow-parens',
+        },
+        highlight = {
+          "RainbowDelimiterRed",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+        },
+      }
+    end,
+  },
 
   -- LSP configuration
   { "neovim/nvim-lspconfig" },
@@ -126,6 +160,7 @@ vim.opt.wildmenu = true                     -- Enhanced command-line completion
 vim.opt.cursorline = true                   -- Highlight current line
 vim.opt.number = true                       -- Show line numbers
 vim.opt.relativenumber = true               -- Show relative line numbers
+vim.opt.showmatch = true                    -- Briefly highlight matching brackets
 vim.opt.showcmd = true                      -- Show command in bottom bar
 
 -- Additional performance settings
@@ -141,6 +176,17 @@ vim.opt.foldnestmax = 3                     -- Maximum fold nesting level
 -- General settings
 vim.opt.history = 1000                      -- Remember more commands and search history
 vim.opt.encoding = "utf-8"                  -- Set default encoding
+
+-- Ensure line numbers stay enabled on normal buffers
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+  callback = function(event)
+    local buftype = vim.api.nvim_get_option_value('buftype', { buf = event.buf })
+    if buftype == '' then
+      vim.opt_local.number = true
+      vim.opt_local.relativenumber = true
+    end
+  end,
+})
 
 -- Performance optimizations for syntax highlighting
 vim.opt.synmaxcol = 200                     -- Limit syntax highlighting to 200 columns for performance
@@ -182,6 +228,9 @@ require('nvim-treesitter.configs').setup{
   highlight = {
     enable = true,
     additional_vim_regex_highlighting = false,
+  },
+  matchup = {
+    enable = true,
   },
 }
 
@@ -298,7 +347,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Web development files (JavaScript, HTML, CSS)
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {"javascript", "html", "css"},
+  pattern = {"javascript", "html", "css", "typescript", "typescriptreact"},
   callback = function()
     vim.opt_local.tabstop = 2
     vim.opt_local.softtabstop = 2
