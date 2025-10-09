@@ -410,6 +410,9 @@ vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
 -- Open terminal
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
 
+-- Diagnostics quick view
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { silent = true, desc = 'Diagnostics popup' })
+
 -- LSPSaga keymaps
 vim.api.nvim_set_keymap('n', '<leader>o', '<cmd>Lspsaga outline<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', { noremap = true, silent = true })
