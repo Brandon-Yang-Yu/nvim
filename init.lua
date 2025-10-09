@@ -173,8 +173,12 @@ vim.opt.updatetime = 300                    -- Faster completion and diagnostics
 vim.opt.timeoutlen = 500                    -- Faster key sequence timeout
 
 -- Code folding settings
-vim.opt.foldmethod = "indent"               -- Fold based on indentation
-vim.opt.foldnestmax = 3                     -- Maximum fold nesting level
+vim.opt.foldmethod = "expr"                -- Use Treesitter-aware folds by default
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"  -- Fold based on syntax tree
+vim.opt.foldnestmax = 20                    -- Allow deep nesting levels to fold
+vim.opt.foldlevel = 1                       -- Show top-level context by default
+vim.opt.foldlevelstart = 1                 -- Start buffers with shallow folds open
+vim.opt.foldenable = true                   -- Make sure folding stays active
 
 -- General settings
 vim.opt.history = 1000                      -- Remember more commands and search history
@@ -187,6 +191,22 @@ vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
     if buftype == '' then
       vim.opt_local.number = true
       vim.opt_local.relativenumber = true
+    end
+  end,
+})
+
+-- Fallback to indent-based folding when Treesitter is unavailable
+vim.api.nvim_create_autocmd("FileType", {
+  callback = function(event)
+    local buftype = vim.api.nvim_get_option_value('buftype', { buf = event.buf })
+    if buftype ~= '' then
+      return
+    end
+
+    local ok = pcall(vim.treesitter.get_parser, event.buf)
+    if not ok then
+      vim.opt_local.foldmethod = "indent"
+      vim.opt_local.foldexpr = ""
     end
   end,
 })
