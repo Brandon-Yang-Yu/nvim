@@ -410,6 +410,8 @@ vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
 -- Open terminal
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
 
+vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]], { silent = true, desc = 'Exit terminal to Normal mode' })
+
 -- Diagnostics quick view
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { silent = true, desc = 'Diagnostics popup' })
 
