@@ -136,7 +136,26 @@ require("lazy").setup({
   { "tpope/vim-fugitive" },
 
   -- Theme
-  { "tomasr/molokai" },
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("catppuccin").setup({
+        flavour = "Macchiato",
+        integrations = {
+          cmp = true,
+          gitsigns = true,
+          mason = true,
+          neotree = true,
+          treesitter = true,
+          lualine = true,
+          fzf = true,
+        },
+      })
+    end,
+  },
 
 })
 
@@ -171,6 +190,7 @@ vim.opt.scrolljump = 5                      -- Jump 5 lines when scrolling off s
 vim.opt.sidescroll = 1                      -- Smooth horizontal scrolling
 vim.opt.updatetime = 300                    -- Faster completion and diagnostics
 vim.opt.timeoutlen = 500                    -- Faster key sequence timeout
+vim.opt.termguicolors = true                -- Enable true color for better theme fidelity
 
 -- Code folding settings
 vim.opt.foldmethod = "expr"                -- Use Treesitter-aware folds by default
@@ -221,8 +241,7 @@ vim.cmd("filetype plugin indent on")       -- Enable file type detection, plugin
 -- Reduce regex engine overhead for better performance
 vim.opt.regexpengine = 1                    -- Use old regex engine for better performance
 
--- Theme
-vim.cmd("colorscheme molokai")              -- Set color scheme
+vim.cmd("colorscheme catppuccin")            -- Set Catppuccin color scheme
 
 -- ==============================================================================
 -- PLUGIN CONFIGURATION
@@ -231,7 +250,7 @@ vim.cmd("colorscheme molokai")              -- Set color scheme
 -- Lualine configuration
 require('lualine').setup {
   options = {
-    theme = 'molokai',
+    theme = 'catppuccin',
     section_separators = { left = '', right = '' },
     component_separators = { left = '', right = '' }
   },
