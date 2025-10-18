@@ -421,8 +421,7 @@ vim.api.nvim_set_keymap('n', 'K', '<cmd>Lspsaga hover_doc<CR>', { noremap = true
 vim.api.nvim_set_keymap('n', '<leader>ci', '<cmd>Lspsaga incoming_calls<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>co', '<cmd>Lspsaga outgoing_calls<CR>', { noremap = true, silent = true })
 
--- Window resize functions (accepts count, e.g., 20> to resize horizontally by 20)
-vim.api.nvim_set_keymap('n', '>', ':<C-u>vertical resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<', ':<C-u>vertical resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '+', ':<C-u>resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '-', ':<C-u>resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>>', ':<C-u>vertical resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader><', ':<C-u>vertical resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>+', ':<C-u>resize +<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>-', ':<C-u>resize -<C-r>=v:count1<CR><CR>', { noremap = true, silent = true })
