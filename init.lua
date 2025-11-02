@@ -186,6 +186,63 @@ vim.opt.showmatch = true                    -- Briefly highlight matching bracke
 vim.opt.showcmd = true                      -- Show command in bottom bar
 vim.o.winbar = "%#Title#[%{winnr()}]%* %f" -- Show window number in winbar for easier jumping
 
+-- Tabline configuration for better readability
+vim.o.showtabline = 2                       -- Always show tabline
+vim.o.tabline = "%!v:lua.MyTabLine()"       -- Use custom tabline function
+
+-- Custom tabline function showing tab number, working directory, and file
+function _G.MyTabLine()
+  local s = ''
+  for i = 1, vim.fn.tabpagenr('$') do
+    -- Select highlighting
+    if i == vim.fn.tabpagenr() then
+      s = s .. '%#TabLineSel#'
+    else
+      s = s .. '%#TabLine#'
+    end
+
+    -- Set the tab page number
+    s = s .. '%' .. i .. 'T'
+
+    -- Get working directory for this tab
+    local cwd = vim.fn.getcwd(-1, i)
+    local home = vim.fn.expand('~')
+    -- Replace home directory with ~
+    if cwd:sub(1, #home) == home then
+      cwd = '~' .. cwd:sub(#home + 1)
+    end
+
+    -- Get last directory name from cwd for compact display
+    local cwd_short = cwd:match('[^/]+$') or cwd
+
+    -- Get buffer name for this tab
+    local buflist = vim.fn.tabpagebuflist(i)
+    local winnr = vim.fn.tabpagewinnr(i)
+    local bufnr = buflist[winnr]
+    local bufname = vim.fn.bufname(bufnr)
+
+    -- Format the display name
+    local display_name = ''
+    if bufname == '' then
+      display_name = '[No Name]'
+    else
+      -- Just show filename for brevity
+      display_name = vim.fn.fnamemodify(bufname, ':t')
+    end
+
+    -- Check if buffer is modified
+    local modified = vim.fn.getbufvar(bufnr, '&modified') == 1 and '+' or ''
+
+    -- Add tab number, working directory, and file name
+    s = s .. ' ' .. i .. ': [' .. cwd_short .. '] ' .. display_name .. modified .. ' '
+  end
+
+  -- After the last tab fill with TabLineFill and reset tab page number
+  s = s .. '%#TabLineFill#%T'
+
+  return s
+end
+
 -- Additional performance settings
 vim.opt.scrolljump = 5                      -- Jump 5 lines when scrolling off screen
 vim.opt.sidescroll = 1                      -- Smooth horizontal scrolling
