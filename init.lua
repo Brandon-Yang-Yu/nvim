@@ -184,6 +184,7 @@ vim.opt.number = true                       -- Show line numbers
 vim.opt.relativenumber = true               -- Show relative line numbers
 vim.opt.showmatch = true                    -- Briefly highlight matching brackets
 vim.opt.showcmd = true                      -- Show command in bottom bar
+vim.o.winbar = "%#Title#[%{winnr()}]%* %f" -- Show window number in winbar for easier jumping
 
 -- Additional performance settings
 vim.opt.scrolljump = 5                      -- Jump 5 lines when scrolling off screen
