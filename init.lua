@@ -135,6 +135,61 @@ require("lazy").setup({
   -- Git integration
   { "tpope/vim-fugitive" },
 
+  -- Markdown rendering
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    ft = { "markdown" },
+    opts = {
+      heading = {
+        enabled = true,
+        sign = true,
+        icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+        width = 'full',
+        backgrounds = {
+          'RenderMarkdownH1Bg',
+          'RenderMarkdownH2Bg',
+          'RenderMarkdownH3Bg',
+          'RenderMarkdownH4Bg',
+          'RenderMarkdownH5Bg',
+          'RenderMarkdownH6Bg',
+        },
+      },
+      code = {
+        enabled = true,
+        sign = true,
+        style = 'full',
+        width = 'block',
+        border = 'thick',
+        language_pad = 2,
+      },
+      bullet = {
+        enabled = true,
+        icons = { '●', '○', '◆', '◇' },
+      },
+      checkbox = {
+        enabled = true,
+        unchecked = { icon = '󰄱 ' },
+        checked = { icon = '󰱒 ' },
+        custom = {
+          todo = { raw = '[-]', rendered = '󰥔 ', highlight = 'RenderMarkdownTodo' },
+        },
+      },
+      quote = { enabled = true, icon = '▋' },
+      pipe_table = {
+        enabled = true,
+        style = 'full',
+        border = { '┌', '┬', '┐', '├', '┼', '┤', '└', '┴', '┘', '│', '─' },
+      },
+      link = {
+        enabled = true,
+        image = '󰥶 ',
+        hyperlink = '󰌹 ',
+      },
+      sign = { enabled = true },
+    },
+  },
+
   -- Theme
   {
     "catppuccin/nvim",
@@ -152,6 +207,7 @@ require("lazy").setup({
           treesitter = true,
           lualine = true,
           fzf = true,
+          render_markdown = true,
         },
       })
     end,
@@ -324,7 +380,7 @@ require('lualine').setup {
 
 -- Treesitter configuration
 require('nvim-treesitter.configs').setup{
-  ensure_installed = { 'typescript', 'tsx', 'javascript' },
+  ensure_installed = { 'typescript', 'tsx', 'javascript', 'markdown', 'markdown_inline' },
   highlight = {
     enable = true,
     additional_vim_regex_highlighting = false,
