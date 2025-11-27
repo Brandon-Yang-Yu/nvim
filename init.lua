@@ -353,6 +353,8 @@ local function claude_code_status()
 end
 
 -- Lualine configuration
+local devicons = require('nvim-web-devicons')
+
 require('lualine').setup {
   options = {
     theme = 'catppuccin',
@@ -371,8 +373,9 @@ require('lualine').setup {
     lualine_a = {
       {
         'tabs',
-        mode = 2,  -- 显示 tab 号和名称
+        mode = 2,
         max_length = vim.o.columns,
+        section_separators = { left = '', right = '' },
         fmt = function(name, context)
           local tabnr = context.tabnr
           local cwd = vim.fn.getcwd(-1, tabnr)
@@ -386,7 +389,11 @@ require('lualine').setup {
           local filename = bufname == '' and '[No Name]' or vim.fn.fnamemodify(bufname, ':t')
           local modified = vim.fn.getbufvar(bufnr, '&modified') == 1 and ' +' or ''
 
-          return '[' .. cwd_short .. '] ' .. filename .. modified
+          -- Get file icon
+          local ext = vim.fn.fnamemodify(bufname, ':e')
+          local icon = devicons.get_icon(filename, ext, { default = true }) or ''
+
+          return icon .. ' [' .. cwd_short .. '] ' .. filename .. modified
         end,
       }
     },
