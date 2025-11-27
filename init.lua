@@ -392,6 +392,18 @@ vim.cmd("colorscheme catppuccin")            -- Set Catppuccin color scheme
 -- PLUGIN CONFIGURATION
 -- ==============================================================================
 
+-- Custom Claude Code status component
+local function claude_code_status()
+  -- Check if we're in a Claude Code session by looking for the CLAUDE_CODE environment variable
+  local claude_active = vim.env.CLAUDE_CODE_SESSION or vim.env.CLAUDE_CODE
+
+  if claude_active then
+    return ' Claude'
+  end
+
+  return ''
+end
+
 -- Lualine configuration
 require('lualine').setup {
   options = {
@@ -403,7 +415,7 @@ require('lualine').setup {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff', 'diagnostics'},
     lualine_c = {'filename'},
-    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_x = {claude_code_status, 'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
   }
