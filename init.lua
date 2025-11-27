@@ -275,62 +275,8 @@ vim.opt.showmode = false                    -- Don't show mode (lualine already 
 vim.opt.cmdheight = 0                       -- Hide command line when not in use
 vim.o.winbar = "%#Title#[%{winnr()}]%* %f" -- Show window number in winbar for easier jumping
 
--- Tabline configuration for better readability
+-- Tabline configuration (managed by lualine)
 vim.o.showtabline = 2                       -- Always show tabline
-vim.o.tabline = "%!v:lua.MyTabLine()"       -- Use custom tabline function
-
--- Custom tabline function showing tab number, working directory, and file
-function _G.MyTabLine()
-  local s = ''
-  for i = 1, vim.fn.tabpagenr('$') do
-    -- Select highlighting
-    if i == vim.fn.tabpagenr() then
-      s = s .. '%#TabLineSel#'
-    else
-      s = s .. '%#TabLine#'
-    end
-
-    -- Set the tab page number
-    s = s .. '%' .. i .. 'T'
-
-    -- Get working directory for this tab
-    local cwd = vim.fn.getcwd(-1, i)
-    local home = vim.fn.expand('~')
-    -- Replace home directory with ~
-    if cwd:sub(1, #home) == home then
-      cwd = '~' .. cwd:sub(#home + 1)
-    end
-
-    -- Get last directory name from cwd for compact display
-    local cwd_short = cwd:match('[^/]+$') or cwd
-
-    -- Get buffer name for this tab
-    local buflist = vim.fn.tabpagebuflist(i)
-    local winnr = vim.fn.tabpagewinnr(i)
-    local bufnr = buflist[winnr]
-    local bufname = vim.fn.bufname(bufnr)
-
-    -- Format the display name
-    local display_name = ''
-    if bufname == '' then
-      display_name = '[No Name]'
-    else
-      -- Just show filename for brevity
-      display_name = vim.fn.fnamemodify(bufname, ':t')
-    end
-
-    -- Check if buffer is modified
-    local modified = vim.fn.getbufvar(bufnr, '&modified') == 1 and '+' or ''
-
-    -- Add tab number, working directory, and file name
-    s = s .. ' ' .. i .. ': [' .. cwd_short .. '] ' .. display_name .. modified .. ' '
-  end
-
-  -- After the last tab fill with TabLineFill and reset tab page number
-  s = s .. '%#TabLineFill#%T'
-
-  return s
-end
 
 -- Additional performance settings
 vim.opt.scrolljump = 5                      -- Jump 5 lines when scrolling off screen
@@ -420,6 +366,35 @@ require('lualine').setup {
     lualine_x = {claude_code_status, 'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
+  },
+  tabline = {
+    lualine_a = {
+      {
+        'tabs',
+        mode = 2,  -- 显示 tab 号和名称
+        max_length = vim.o.columns,
+        fmt = function(name, context)
+          local tabnr = context.tabnr
+          local cwd = vim.fn.getcwd(-1, tabnr)
+          local cwd_short = cwd:match('[^/]+$') or cwd
+
+          local buflist = vim.fn.tabpagebuflist(tabnr)
+          local winnr = vim.fn.tabpagewinnr(tabnr)
+          local bufnr = buflist[winnr]
+          local bufname = vim.fn.bufname(bufnr)
+
+          local filename = bufname == '' and '[No Name]' or vim.fn.fnamemodify(bufname, ':t')
+          local modified = vim.fn.getbufvar(bufnr, '&modified') == 1 and ' +' or ''
+
+          return '[' .. cwd_short .. '] ' .. filename .. modified
+        end,
+      }
+    },
+    lualine_b = {},
+    lualine_c = {},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = {}
   }
 }
 
