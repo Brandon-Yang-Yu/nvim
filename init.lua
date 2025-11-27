@@ -271,6 +271,7 @@ vim.opt.number = true                       -- Show line numbers
 vim.opt.relativenumber = true               -- Show relative line numbers
 vim.opt.showmatch = true                    -- Briefly highlight matching brackets
 vim.opt.showcmd = true                      -- Show command in bottom bar
+vim.opt.showmode = false                    -- Don't show mode (lualine already shows it)
 vim.o.winbar = "%#Title#[%{winnr()}]%* %f" -- Show window number in winbar for easier jumping
 
 -- Tabline configuration for better readability
