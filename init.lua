@@ -120,7 +120,45 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
-    }
+    },
+    config = function()
+      require("neo-tree").setup({
+        close_if_last_window = true,
+        source_selector = {
+          winbar = true,
+        },
+        window = {
+          position = "left",
+          width = 30,
+          mapping_options = {
+            noremap = true,
+            nowait = true,
+          },
+        },
+        filesystem = {
+          follow_current_file = {
+            enabled = true,
+          },
+          use_libuv_file_watcher = true,
+        },
+      })
+      -- 让 Neo-tree 窗口不被其他窗口分割
+      vim.api.nvim_create_autocmd("BufEnter", {
+        callback = function()
+          local neo_tree_wins = {}
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+            if ft == "neo-tree" then
+              table.insert(neo_tree_wins, win)
+            end
+          end
+          for _, win in ipairs(neo_tree_wins) do
+            vim.api.nvim_win_set_option(win, "winfixwidth", true)
+          end
+        end,
+      })
+    end,
   },
 
   -- Status line
@@ -564,8 +602,36 @@ vim.api.nvim_set_keymap('n', '<leader>ff', ':FZF<CR>', { noremap = true })
 -- Neo-tree file explorer
 vim.api.nvim_set_keymap('n', '<leader>ee', ':Neotree toggle<CR>', { noremap = true })
 
--- Git integration
-vim.api.nvim_set_keymap('n', '<leader>gg', ':Git<CR>', { noremap = true })
+-- Git integration (open in top split, excluding Neo-tree area)
+vim.api.nvim_set_keymap('n', '<leader>gg', '', {
+  noremap = true,
+  callback = function()
+    -- 找到一个非 Neo-tree 的窗口
+    local target_win = nil
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+      if ft ~= "neo-tree" then
+        target_win = win
+        break
+      end
+    end
+
+    if target_win then
+      vim.api.nvim_set_current_win(target_win)
+    end
+
+    -- 在当前窗口上方打开 Git (aboveleft 保证不影响 Neo-tree)
+    vim.cmd('aboveleft Git')
+
+    -- 调整 fugitive 窗口高度为上半屏幕
+    vim.schedule(function()
+      local fugitive_win = vim.api.nvim_get_current_win()
+      local total_height = vim.o.lines - vim.o.cmdheight - 2  -- 减去 tabline 和 statusline
+      vim.api.nvim_win_set_height(fugitive_win, math.floor(total_height / 2))
+    end)
+  end
+})
 
 -- Open terminal
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
