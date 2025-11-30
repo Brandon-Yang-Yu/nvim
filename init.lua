@@ -191,6 +191,19 @@ require("lazy").setup({
 
   -- Git integration
   { "tpope/vim-fugitive" },
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("diffview").setup({
+        view = {
+          merge_tool = {
+            layout = "diff3_mixed",
+          },
+        },
+      })
+    end,
+  },
 
   -- Markdown rendering
   {
@@ -289,6 +302,7 @@ require("lazy").setup({
         flavour = "Macchiato",
         integrations = {
           cmp = true,
+          diffview = true,
           gitsigns = true,
           mason = true,
           neotree = true,
@@ -627,6 +641,12 @@ vim.api.nvim_set_keymap('n', '<leader>fs', ':FzfLua git_status<CR>', { noremap =
 
 -- Neo-tree file explorer
 vim.api.nvim_set_keymap('n', '<leader>ee', ':Neotree toggle<CR>', { noremap = true })
+
+-- Diffview (Git history viewer)
+vim.api.nvim_set_keymap('n', '<leader>gh', ':DiffviewFileHistory<CR>', { noremap = true, silent = true, desc = 'Git history (all)' })
+vim.api.nvim_set_keymap('n', '<leader>gf', ':DiffviewFileHistory %<CR>', { noremap = true, silent = true, desc = 'Git history (current file)' })
+vim.api.nvim_set_keymap('n', '<leader>gd', ':DiffviewOpen<CR>', { noremap = true, silent = true, desc = 'Diff with HEAD' })
+vim.api.nvim_set_keymap('n', '<leader>gc', ':DiffviewClose<CR>', { noremap = true, silent = true, desc = 'Close diffview' })
 
 -- Git integration (open in top split, excluding Neo-tree area)
 vim.api.nvim_set_keymap('n', '<leader>gg', '', {
