@@ -111,8 +111,27 @@ require("lazy").setup({
   },
 
   -- File searching and navigation
-  { "junegunn/fzf", build = "./install --all" },
-  { "junegunn/fzf.vim" },
+  {
+    "ibhagwan/fzf-lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup({
+        winopts = {
+          height = 0.85,
+          width = 0.80,
+          preview = {
+            layout = "vertical",
+            vertical = "down:50%",
+          },
+        },
+        git = {
+          status = {
+            preview_pager = false,
+          },
+        },
+      })
+    end,
+  },
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -275,7 +294,7 @@ require("lazy").setup({
           neotree = true,
           treesitter = true,
           lualine = true,
-          fzf = true,
+          fzf_lua = true,
           render_markdown = true,
         },
       })
@@ -596,8 +615,15 @@ vim.g.mapleader = "\\"
 -- Delete to void register (doesn't overwrite clipboard)
 vim.api.nvim_set_keymap('n', '<leader>d', '"_d', { noremap = true })
 
--- FZF file finder
-vim.api.nvim_set_keymap('n', '<leader>ff', ':FZF<CR>', { noremap = true })
+-- FZF-Lua
+vim.api.nvim_set_keymap('n', '<leader>ff', ':FzfLua files<CR>', { noremap = true })           -- 查找文件
+vim.api.nvim_set_keymap('n', '<leader>fb', ':FzfLua buffers<CR>', { noremap = true })         -- 切换 buffer
+vim.api.nvim_set_keymap('n', '<leader>fg', ':FzfLua live_grep<CR>', { noremap = true })       -- 全局搜索内容
+vim.api.nvim_set_keymap('n', '<leader>fr', ':FzfLua registers<CR>', { noremap = true })       -- 寄存器列表
+vim.api.nvim_set_keymap('n', '<leader>fh', ':FzfLua oldfiles<CR>', { noremap = true })        -- 最近文件
+vim.api.nvim_set_keymap('n', '<leader>fl', ':FzfLua lines<CR>', { noremap = true })           -- 当前文件搜索行
+vim.api.nvim_set_keymap('n', '<leader>fc', ':FzfLua git_commits<CR>', { noremap = true })     -- Git 提交历史
+vim.api.nvim_set_keymap('n', '<leader>fs', ':FzfLua git_status<CR>', { noremap = true })      -- Git 变更文件
 
 -- Neo-tree file explorer
 vim.api.nvim_set_keymap('n', '<leader>ee', ':Neotree toggle<CR>', { noremap = true })
