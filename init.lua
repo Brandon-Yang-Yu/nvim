@@ -652,9 +652,12 @@ vim.api.nvim_set_keymap('n', '<leader>gc', ':DiffviewClose<CR>', { noremap = tru
 vim.api.nvim_set_keymap('n', '<leader>gg', '', {
   noremap = true,
   callback = function()
-    -- 找到一个非 Neo-tree 的窗口
+    -- 先获取当前 buffer 的文件目录（在切换窗口前）
+    local file_dir = vim.fn.expand('%:p:h')
+
+    -- 找到当前 tab 中一个非 Neo-tree 的窗口
     local target_win = nil
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
       local buf = vim.api.nvim_win_get_buf(win)
       local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
       if ft ~= "neo-tree" then
@@ -667,13 +670,19 @@ vim.api.nvim_set_keymap('n', '<leader>gg', '', {
       vim.api.nvim_set_current_win(target_win)
     end
 
-    -- 在当前窗口上方打开 Git (aboveleft 保证不影响 Neo-tree)
+    -- 获取当前文件所属的 git 仓库根目录（支持 submodule）
+    if file_dir ~= '' and vim.fn.isdirectory(file_dir) == 1 then
+      local git_root = vim.fn.system('git -C ' .. vim.fn.shellescape(file_dir) .. ' rev-parse --show-toplevel 2>/dev/null'):gsub('\n', '')
+      if git_root ~= '' then
+        vim.cmd('tcd ' .. vim.fn.fnameescape(git_root))
+      end
+    end
     vim.cmd('aboveleft Git')
 
     -- 调整 fugitive 窗口高度为上半屏幕
     vim.schedule(function()
       local fugitive_win = vim.api.nvim_get_current_win()
-      local total_height = vim.o.lines - vim.o.cmdheight - 2  -- 减去 tabline 和 statusline
+      local total_height = vim.o.lines - vim.o.cmdheight - 2
       vim.api.nvim_win_set_height(fugitive_win, math.floor(total_height / 2))
     end)
   end
