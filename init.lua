@@ -145,6 +145,11 @@ require("lazy").setup({
         close_if_last_window = true,
         source_selector = {
           winbar = true,
+          sources = {
+            { source = "filesystem", display_name = " Files" },
+            { source = "buffers", display_name = " Buffers" },
+            { source = "git_status", display_name = " Git" },
+          },
         },
         window = {
           position = "left",
@@ -152,6 +157,24 @@ require("lazy").setup({
           mapping_options = {
             noremap = true,
             nowait = true,
+          },
+        },
+        buffers = {
+          follow_current_file = {
+            enabled = true,
+          },
+          group_empty_dirs = false,
+          show_unloaded = false,
+          window = {
+            mappings = {
+              ["d"] = function(state)
+                local node = state.tree:get_node()
+                if node and node.extra and node.extra.bufnr then
+                  pcall(vim.api.nvim_buf_delete, node.extra.bufnr, { force = true })
+                  require("neo-tree.sources.manager").refresh("buffers")
+                end
+              end,
+            },
           },
         },
         filesystem = {
@@ -692,6 +715,18 @@ vim.api.nvim_set_keymap('n', '<leader>gg', '', {
 vim.api.nvim_set_keymap('n', '<leader>tt', ':term<CR>', { noremap = true })
 
 vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]], { silent = true, desc = 'Exit terminal to Normal mode' })
+
+-- Clear all terminal buffers
+vim.keymap.set('n', '<leader>tc', function()
+  local closed = 0
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].buftype == 'terminal' then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+      closed = closed + 1
+    end
+  end
+  vim.notify('Closed ' .. closed .. ' terminal(s)', vim.log.levels.INFO)
+end, { desc = 'Clear all terminals' })
 
 -- Diagnostics quick view
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { silent = true, desc = 'Diagnostics popup' })
