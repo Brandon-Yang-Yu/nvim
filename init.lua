@@ -124,6 +124,12 @@ require("lazy").setup({
             vertical = "down:50%",
           },
         },
+        files = {
+          fd_opts = "--type f --hidden --no-ignore", -- 显示隐藏文件和被 gitignore 的文件
+        },
+        grep = {
+          rg_opts = "--hidden --no-ignore --column --line-number --no-heading --color=always --smart-case",
+        },
         git = {
           status = {
             preview_pager = false,
@@ -182,6 +188,11 @@ require("lazy").setup({
             enabled = true,
           },
           use_libuv_file_watcher = true,
+          filtered_items = {
+            visible = true,         -- 显示被过滤的文件（灰色）
+            hide_dotfiles = false,
+            hide_gitignored = false, -- 不隐藏被 git 忽略的文件
+          },
         },
       })
       -- 让 Neo-tree 窗口不被其他窗口分割
