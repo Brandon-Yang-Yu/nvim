@@ -686,12 +686,13 @@ vim.api.nvim_set_keymap('n', '<leader>gc', ':DiffviewClose<CR>', { noremap = tru
 vim.api.nvim_set_keymap('n', '<leader>gg', '', {
   noremap = true,
   callback = function()
-    -- 检查是否已有 fugitive 窗口，如果有则跳转到它
+    -- 检查是否已有 fugitive 窗口，如果有则跳转并刷新
     for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
       local buf = vim.api.nvim_win_get_buf(win)
       local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
       if ft == "fugitive" then
         vim.api.nvim_set_current_win(win)
+        vim.cmd('edit')  -- 刷新 fugitive 状态
         return
       end
     end
